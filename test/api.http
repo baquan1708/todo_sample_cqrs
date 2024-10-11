@@ -64,24 +64,23 @@ Authorization: {{token}}
 X-Tenant-Code: MBC
 
 {
-  "name": "first",
+  "name": "First task",
   "attributes": {
-    "description": "first desc"
+    "description": "Description for the first task"
   }
 }
 
 ###
-PATCH {{apiBaseUrl}}/todo/TODO%23MBC/01J9R0JPF04A5HPRQ5RR8GGYDY
+PATCH {{apiBaseUrl}}/todo/TODO%23MBC/01J9WJM4W0S5R4KN5MG080KVB4
 Accept: application/json
 Content-Type: application/json
 Authorization: {{token}}
 X-Tenant-Code: MBC
 
 {
-  "name": "First update1",
+  "name": "First update",
   "attributes": {
-    "description": "Descripton for first todo",
-    "dueDate": "2024-10-30T03:59:43.590Z"
+    "status": "COMPLETED"
   }
 }
 
