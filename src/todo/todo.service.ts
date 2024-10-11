@@ -9,13 +9,14 @@ import {
   toISOStringWithTimezone,
   VERSION_FIRST,
 } from '@mbc-cqrs-serverless/core'
+import { TaskService } from '@mbc-cqrs-serverless/task'
 import {
   BadRequestException,
   Injectable,
   Logger,
   NotFoundException,
 } from '@nestjs/common'
-import { Prisma } from '@prisma/client'
+import { Prisma, TodoStatus } from '@prisma/client'
 import {
   generateTodoPk,
   generateTodoSk,
@@ -40,6 +41,7 @@ export class TodoService {
     private readonly commandService: CommandService,
     private readonly dataService: DataService,
     private readonly prismaService: PrismaService,
+    private readonly taskService: TaskService,
   ) {}
 
   async create(
@@ -61,6 +63,7 @@ export class TodoService {
       attributes: createDto.attributes,
     })
     const item = await this.commandService.publish(todo, opts)
+
     return new TodoDataEntity(item as TodoDataEntity)
   }
 
@@ -160,10 +163,23 @@ export class TodoService {
         ...updateDto.attributes,
       },
     }
+
     const item = await this.commandService.publishPartialUpdate(
       commandDto,
       opts,
     )
+
+    if (commandDto.attributes?.status === TodoStatus.COMPLETED) {
+      await this.taskService.createTask(
+        {
+          tenantCode,
+          taskType: 'todo',
+          input: item,
+        },
+        opts,
+      )
+    }
+
     return new TodoDataEntity(item as TodoDataEntity)
   }
 
